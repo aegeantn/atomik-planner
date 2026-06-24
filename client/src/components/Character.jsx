@@ -1,423 +1,342 @@
-// Character.jsx — Tier'a göre CSS 3D SVG karakter
-// Her tier farklı bir karakter görünümü ve animasyonu taşır.
-// Teknik: SVG gradient katmanları + CSS 3D filter + float animasyonu
+// Character.jsx — Bubu/Dudu tarzı sevimli ayı karakteri
+// Tier'a göre görünümü ve animasyonu değişir.
+// SVG animasyonları için CSS float + SVG animateTransform kullanılır.
 
 export default function Character({ tier = 1 }) {
   return (
-    <div className="character-float" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      {tier === 1 && <Caylan />}
-      {tier === 2 && <Azimli />}
-      {tier === 3 && <Disiplinli />}
-      {tier === 4 && <Kahraman />}
-      {tier === 5 && <Efsane />}
+    <div
+      className="character-float"
+      style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+    >
+      {tier === 1 && <T1Caylan />}
+      {tier === 2 && <T2Azimli />}
+      {tier === 3 && <T3Disiplinli />}
+      {tier === 4 && <T4Kahraman />}
+      {tier === 5 && <T5Efsane />}
     </div>
   )
 }
 
-// ─── Tier 1: Çaylak ──────────────────────────────────────────
-// Küçük, yuvarlak, uyuklayan figür. Gri-kahve tonlar.
-function Caylan() {
+// ── Ortak renk paleti ──────────────────────────────────────
+const FUR   = '#C8966A'   // ana kürk
+const EAR   = '#B07850'   // kulak dışı
+const EAR_I = '#F0A898'   // kulak içi (pembe)
+const CREAM = '#F0D8B0'   // yüz ortası açık krem
+const DARK  = '#2A1508'   // göz / burun / ağız
+const WHITE = '#FFFFFF'
+
+// ── Temel kafa + gövde ────────────────────────────────────
+// (svgProps ve color overrides ile tier başına özelleştirme)
+function BearBase({
+  furColor = FUR,
+  eyeColor = DARK,
+  eyeGlow  = false,
+  smile    = 'normal',  // normal | big | tiny
+  brows    = false,     // kaşlar (kararlı ifade)
+  children,             // aksesuar katmanları (kıyafet, taç vb)
+}) {
+  const smilePath =
+    smile === 'big'   ? 'M40 62 Q50 70 60 62' :
+    smile === 'tiny'  ? 'M44 61 Q50 64 56 61' :
+                        'M42 61 Q50 66 58 61'
+
   return (
-    <svg
-      width="160" height="160"
-      viewBox="0 0 100 100"
+    <>
+      {/* Kulaklar */}
+      <circle cx="26" cy="24" r="12" fill={EAR} />
+      <circle cx="74" cy="24" r="12" fill={EAR} />
+      <circle cx="26" cy="24" r="7"  fill={EAR_I} />
+      <circle cx="74" cy="24" r="7"  fill={EAR_I} />
+
+      {/* Kafa */}
+      <circle cx="50" cy="50" r="30" fill={furColor} />
+      {/* Hacim gölgesi (sağ alt) */}
+      <ellipse cx="62" cy="60" rx="16" ry="12"
+        fill="rgba(0,0,0,0.06)" />
+
+      {/* Yüz ortası — krem bölge */}
+      <ellipse cx="50" cy="57" rx="18" ry="15" fill={CREAM} />
+
+      {/* Gözler */}
+      <circle cx="39" cy="46" r="6" fill={eyeGlow ? '#F2B705' : DARK} />
+      <circle cx="61" cy="46" r="6" fill={eyeGlow ? '#F2B705' : DARK} />
+      {/* Göz iç */}
+      <circle cx="39" cy="46" r="3.5" fill={eyeGlow ? '#FFE04D' : '#1A0C04'} />
+      <circle cx="61" cy="46" r="3.5" fill={eyeGlow ? '#FFE04D' : '#1A0C04'} />
+      {/* Parıltı */}
+      <circle cx="41" cy="44" r="2" fill={WHITE} />
+      <circle cx="63" cy="44" r="2" fill={WHITE} />
+
+      {/* Kaşlar (kararlı ifade için) */}
+      {brows && (
+        <>
+          <path d="M33 39 Q39 36 45 39" stroke={DARK} strokeWidth="2.2"
+            strokeLinecap="round" fill="none" />
+          <path d="M55 39 Q61 36 67 39" stroke={DARK} strokeWidth="2.2"
+            strokeLinecap="round" fill="none" />
+        </>
+      )}
+
+      {/* Burun */}
+      <ellipse cx="50" cy="55" rx="3.5" ry="2.5" fill={DARK} />
+
+      {/* Ağız */}
+      <path d={smilePath} stroke={DARK} strokeWidth="1.8"
+        strokeLinecap="round" fill="none" />
+
+      {/* Yanak pembesi */}
+      <ellipse cx="32" cy="60" rx="7" ry="5" fill="rgba(255,150,130,0.25)" />
+      <ellipse cx="68" cy="60" rx="7" ry="5" fill="rgba(255,150,130,0.25)" />
+
+      {/* Aksesuarlar (tier bazlı ek katmanlar) */}
+      {children}
+
+      {/* Gövde */}
+      <ellipse cx="50" cy="96" rx="22" ry="18" fill={furColor} />
+      {/* Gövde hacim */}
+      <ellipse cx="57" cy="100" rx="12" ry="9" fill="rgba(0,0,0,0.06)" />
+    </>
+  )
+}
+
+// ── T1 Çaylak — El sallayan, sade ────────────────────────
+function T1Caylan() {
+  return (
+    <svg width="150" height="170" viewBox="0 0 100 120"
       fill="none"
-      style={{ filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.15))', transform: 'scale(0.85)' }}
+      style={{ filter: 'drop-shadow(0 6px 14px rgba(0,0,0,0.14))' }}
     >
-      <defs>
-        <radialGradient id="c1-body" cx="40%" cy="35%" r="60%">
-          <stop offset="0%" stopColor="#D4C5A9" />
-          <stop offset="100%" stopColor="#A08060" />
-        </radialGradient>
-        <radialGradient id="c1-face" cx="45%" cy="40%" r="55%">
-          <stop offset="0%" stopColor="#F5E6C8" />
-          <stop offset="100%" stopColor="#D4A870" />
-        </radialGradient>
-      </defs>
-
       {/* Gölge */}
-      <ellipse cx="50" cy="94" rx="22" ry="5" fill="rgba(0,0,0,0.12)" />
+      <ellipse cx="50" cy="117" rx="22" ry="4.5" fill="rgba(0,0,0,0.1)" />
 
-      {/* Gövde — yuvarlak, küçük */}
-      <ellipse cx="50" cy="65" rx="22" ry="24" fill="url(#c1-body)" />
+      <BearBase smile="tiny">
+        {/* Sol kol — aşağıda */}
+        <ellipse cx="25" cy="100" rx="8" ry="13" fill={FUR}
+          transform="rotate(10 25 100)" />
 
-      {/* Kol sağ */}
-      <ellipse cx="74" cy="68" rx="7" ry="5" fill="#A08060" transform="rotate(20 74 68)" />
-      {/* Kol sol */}
-      <ellipse cx="26" cy="68" rx="7" ry="5" fill="#A08060" transform="rotate(-20 26 68)" />
-
-      {/* Baş */}
-      <circle cx="50" cy="42" r="20" fill="url(#c1-face)" />
-      {/* Hacim gölgesi baş */}
-      <ellipse cx="58" cy="48" rx="10" ry="8" fill="rgba(160,110,60,0.2)" />
-
-      {/* Uyuklayan gözler — kapalı çizgiler */}
-      <path d="M40 41 Q43 39 46 41" stroke="#6B4F2A" strokeWidth="1.8" strokeLinecap="round" fill="none" />
-      <path d="M54 41 Q57 39 60 41" stroke="#6B4F2A" strokeWidth="1.8" strokeLinecap="round" fill="none" />
-
-      {/* Uyku z'ları */}
-      <text x="68" y="28" fontSize="7" fill="#A08060" fontFamily="serif" opacity="0.8">z</text>
-      <text x="74" y="20" fontSize="9" fill="#A08060" fontFamily="serif" opacity="0.6">z</text>
-      <text x="80" y="13" fontSize="11" fill="#A08060" fontFamily="serif" opacity="0.4">z</text>
-
-      {/* Ağız — hafif düşük */}
-      <path d="M44 50 Q50 48 56 50" stroke="#6B4F2A" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-
-      {/* Şapka */}
-      <ellipse cx="50" cy="25" rx="18" ry="4" fill="#8B7355" />
-      <rect x="38" y="10" width="24" height="16" rx="4" fill="#7A6245" />
+        {/* Sağ kol — el sallıyor; pivot omuz noktası (75, 88) */}
+        <g transform="translate(75, 88)">
+          <ellipse cx="0" cy="10" rx="8" ry="13" fill={FUR}
+            transform="rotate(-10)" />
+          {/* El (küçük yuvarlak) */}
+          <circle cx="-3" cy="22" r="6" fill={FUR} />
+          {/* Parmaklar */}
+          <circle cx="-8" cy="18" r="3" fill={FUR} />
+          <circle cx="-9" cy="13" r="3" fill={FUR} />
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            values="0; -55; 10; -55; 0"
+            dur="1.1s"
+            repeatCount="indefinite"
+          />
+        </g>
+      </BearBase>
     </svg>
   )
 }
 
-// ─── Tier 2: Azimli ──────────────────────────────────────────
-// Ayağa kalkmış, yumruk kaldıran figür. Marigold aksanlar.
-function Azimli() {
+// ── T2 Azimli — Yumruk kaldıran, bandanalı ───────────────
+function T2Azimli() {
   return (
-    <svg
-      width="160" height="170"
-      viewBox="0 0 100 110"
+    <svg width="160" height="180" viewBox="0 0 100 120"
+      fill="none"
+      style={{ filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.16))' }}
+    >
+      <ellipse cx="50" cy="117" rx="24" ry="4.5" fill="rgba(0,0,0,0.12)" />
+
+      <BearBase smile="normal" brows={true}>
+        {/* Marigold kafa bandı */}
+        <rect x="22" y="29" width="56" height="10" rx="5" fill="#F2B705" />
+        {/* Bandaj düğüm sağda */}
+        <ellipse cx="74" cy="34" rx="5" ry="4" fill="#E0A500" />
+
+        {/* Sol kol — aşağıda */}
+        <ellipse cx="25" cy="100" rx="8" ry="13" fill={FUR}
+          transform="rotate(10 25 100)" />
+        <circle cx="22" cy="112" r="7" fill={FUR} />
+
+        {/* Sağ kol — yukarı kaldırılmış (yumruk) */}
+        <g transform="translate(75, 88)">
+          <ellipse cx="0" cy="-8" rx="8" ry="13" fill={FUR} />
+          {/* Yumruk */}
+          <rect x="-7" y="-24" width="14" height="12" rx="5" fill={FUR} />
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            values="-50; -60; -45; -60; -50"
+            dur="1.4s"
+            repeatCount="indefinite"
+          />
+        </g>
+      </BearBase>
+    </svg>
+  )
+}
+
+// ── T3 Disiplinli — Zırhlı, rozetli ─────────────────────
+function T3Disiplinli() {
+  return (
+    <svg width="165" height="185" viewBox="0 0 100 122"
       fill="none"
       style={{ filter: 'drop-shadow(0 10px 18px rgba(0,0,0,0.18))' }}
     >
-      <defs>
-        <radialGradient id="c2-body" cx="38%" cy="30%" r="65%">
-          <stop offset="0%" stopColor="#5C8AE6" />
-          <stop offset="100%" stopColor="#2D5FC4" />
-        </radialGradient>
-        <radialGradient id="c2-face" cx="42%" cy="38%" r="55%">
-          <stop offset="0%" stopColor="#FDDBA0" />
-          <stop offset="100%" stopColor="#D4A050" />
-        </radialGradient>
-      </defs>
+      <ellipse cx="50" cy="119" rx="26" ry="5" fill="rgba(0,0,0,0.14)" />
 
-      {/* Gölge */}
-      <ellipse cx="50" cy="106" rx="24" ry="5" fill="rgba(0,0,0,0.14)" />
+      <BearBase smile="normal" brows={true}>
+        {/* Kask / başlık — sert görünüm */}
+        <path d="M22 38 Q24 16 50 13 Q76 16 78 38"
+          fill="#4A6A8A" />
+        {/* Kask kenar şeridi */}
+        <rect x="22" y="36" width="56" height="7" rx="3" fill="#3A5470" />
+        {/* Marigold rozet kaskte */}
+        <circle cx="50" cy="22" r="7" fill="#F2B705" />
+        <polygon points="50,17 51.8,22.5 57.5,22.5 52.9,25.8 54.7,31.3 50,28 45.3,31.3 47.1,25.8 42.5,22.5 48.2,22.5"
+          fill="white" />
 
-      {/* Bacaklar */}
-      <rect x="38" y="80" width="10" height="22" rx="5" fill="#1E3F9A" />
-      <rect x="52" y="80" width="10" height="22" rx="5" fill="#1E3F9A" />
-      {/* Ayak */}
-      <ellipse cx="43" cy="102" rx="8" ry="4" fill="#142B6E" />
-      <ellipse cx="57" cy="102" rx="8" ry="4" fill="#142B6E" />
+        {/* Sol kol — güçlü poz, hafif öne */}
+        <ellipse cx="22" cy="98" rx="8" ry="14" fill={FUR}
+          transform="rotate(15 22 98)" />
+        <circle cx="18" cy="110" r="8" fill={FUR} />
 
-      {/* Gövde */}
-      <rect x="32" y="52" width="36" height="32" rx="10" fill="url(#c2-body)" />
+        {/* Sağ kol — güçlü poz, hafif öne */}
+        <ellipse cx="78" cy="98" rx="8" ry="14" fill={FUR}
+          transform="rotate(-15 78 98)" />
+        <circle cx="82" cy="110" r="8" fill={FUR} />
 
-      {/* Marigold bant */}
-      <rect x="32" y="64" width="36" height="6" fill="#F2B705" rx="2" />
+        {/* Göğüs rozeti */}
+        <circle cx="50" cy="96" r="9" fill="#F2B705" />
+        <circle cx="50" cy="96" r="6" fill="#FFD040" />
+        <text x="46.5" y="100" fontSize="8" fill={DARK} fontFamily="sans-serif">★</text>
+      </BearBase>
+    </svg>
+  )
+}
 
-      {/* Kol sol — aşağı */}
-      <rect x="20" y="54" width="12" height="22" rx="6" fill="#2D5FC4" />
-      <ellipse cx="26" cy="77" rx="7" ry="6" fill="#FDDBA0" />
+// ── T4 Kahraman — Pelerinli, taçlı ──────────────────────
+function T4Kahraman() {
+  return (
+    <svg width="175" height="200" viewBox="0 0 110 128"
+      fill="none"
+      style={{
+        filter:
+          'drop-shadow(0 0 14px rgba(242,183,5,0.35)) drop-shadow(0 12px 22px rgba(0,0,0,0.2))',
+        transform: 'scale(1.04)',
+      }}
+    >
+      <ellipse cx="55" cy="124" rx="28" ry="5.5" fill="rgba(0,0,0,0.16)" />
 
-      {/* Kol sağ — yukarı kaldırılmış (punch animasyonu) */}
-      <g className="character-punch">
-        <rect x="68" y="35" width="12" height="22" rx="6" fill="#2D5FC4" transform="rotate(-25 74 46)" />
-        <ellipse cx="78" cy="36" rx="7" ry="6" fill="#FDDBA0" transform="rotate(-25 78 36)" />
+      {/* Pelerin (gövdenin arkasında) */}
+      <path d="M30 92 Q18 105 22 122 L55 110 L88 122 Q92 105 80 92 Q55 100 30 92Z"
+        fill="#F2B705" />
+      <path d="M32 93 Q55 102 78 93" stroke="rgba(255,255,255,0.3)"
+        strokeWidth="1.5" fill="none" />
+
+      <g transform="translate(5, 0)">
+        <BearBase furColor={FUR} eyeGlow={false} smile="big" brows={true}>
+          {/* Taç */}
+          <path d="M25 36 L30 22 L38 32 L50 18 L62 32 L70 22 L75 36"
+            fill="#F2B705" strokeLinejoin="round" />
+          <circle cx="50" cy="19" r="4" fill="white" />
+          <circle cx="30" cy="22" r="3" fill="#FFD040" />
+          <circle cx="70" cy="22" r="3" fill="#FFD040" />
+
+          {/* Sol kol — açık, kahraman duruşu */}
+          <ellipse cx="20" cy="96" rx="8" ry="14" fill={FUR}
+            transform="rotate(20 20 96)" />
+          <circle cx="15" cy="108" r="8" fill={FUR} />
+          {/* Sağ kol */}
+          <ellipse cx="80" cy="96" rx="8" ry="14" fill={FUR}
+            transform="rotate(-20 80 96)" />
+          <circle cx="85" cy="108" r="8" fill={FUR} />
+
+          {/* Pelerin düğmesi */}
+          <circle cx="50" cy="92" r="6" fill="#F2B705" />
+          <circle cx="50" cy="92" r="3.5" fill="#FFD040" />
+        </BearBase>
       </g>
-
-      {/* Baş */}
-      <circle cx="50" cy="35" r="22" fill="url(#c2-face)" />
-      <ellipse cx="58" cy="42" rx="11" ry="9" fill="rgba(180,120,40,0.2)" />
-
-      {/* Gözler — açık, kararlı */}
-      <circle cx="43" cy="33" r="4.5" fill="white" />
-      <circle cx="57" cy="33" r="4.5" fill="white" />
-      <circle cx="44" cy="34" r="2.5" fill="#1C1410" />
-      <circle cx="58" cy="34" r="2.5" fill="#1C1410" />
-      {/* Parlak nokta */}
-      <circle cx="45" cy="33" r="1" fill="white" />
-      <circle cx="59" cy="33" r="1" fill="white" />
-
-      {/* Kaş — inen, kararlı */}
-      <path d="M39 27 L47 29" stroke="#6B3E10" strokeWidth="2" strokeLinecap="round" />
-      <path d="M53 29 L61 27" stroke="#6B3E10" strokeWidth="2" strokeLinecap="round" />
-
-      {/* Ağız — küçük gülümseme */}
-      <path d="M44 42 Q50 46 56 42" stroke="#8B4E10" strokeWidth="1.8" strokeLinecap="round" fill="none" />
-
-      {/* Saç */}
-      <path d="M30 28 Q35 12 50 12 Q65 12 70 28" fill="#3A2510" />
     </svg>
   )
 }
 
-// ─── Tier 3: Disiplinli ──────────────────────────────────────
-// Zırhlı figür, güçlü duruş, koyu konturlar.
-function Disiplinli() {
+// ── T5 Efsane — Altın, taçlı, dönen hale ────────────────
+function T5Efsane() {
+  const GOLD_FUR = '#D4A040'
+
   return (
-    <svg
-      width="170" height="185"
-      viewBox="0 0 100 110"
+    <svg width="185" height="215" viewBox="0 0 120 135"
       fill="none"
-      style={{ filter: 'drop-shadow(0 12px 20px rgba(0,0,0,0.22))' }}
+      style={{
+        filter:
+          'drop-shadow(0 0 24px rgba(242,183,5,0.6)) drop-shadow(0 14px 28px rgba(0,0,0,0.22))',
+        transform: 'scale(1.07)',
+      }}
     >
-      <defs>
-        <radialGradient id="c3-armor" cx="35%" cy="25%" r="65%">
-          <stop offset="0%" stopColor="#8AACCC" />
-          <stop offset="100%" stopColor="#3A6080" />
-        </radialGradient>
-        <radialGradient id="c3-face" cx="42%" cy="38%" r="55%">
-          <stop offset="0%" stopColor="#FDDBA0" />
-          <stop offset="100%" stopColor="#C49040" />
-        </radialGradient>
-        <linearGradient id="c3-shield" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#F2B705" />
-          <stop offset="100%" stopColor="#C88800" />
-        </linearGradient>
-      </defs>
-
-      {/* Gölge */}
-      <ellipse cx="50" cy="107" rx="28" ry="5.5" fill="rgba(0,0,0,0.18)" />
-
-      {/* Bacaklar — zırhlı */}
-      <rect x="35" y="78" width="13" height="25" rx="5" fill="#2A4A60" />
-      <rect x="52" y="78" width="13" height="25" rx="5" fill="#2A4A60" />
-      <ellipse cx="41" cy="103" rx="9" ry="4" fill="#1C3040" />
-      <ellipse cx="58" cy="103" rx="9" ry="4" fill="#1C3040" />
-
-      {/* Gövde zırh */}
-      <path d="M28 55 L28 82 Q50 90 72 82 L72 55 Q50 48 28 55Z" fill="url(#c3-armor)" />
-      {/* Zırh detay çizgileri */}
-      <path d="M35 58 L35 80" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
-      <path d="M65 58 L65 80" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
-      <path d="M28 68 Q50 72 72 68" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" fill="none" />
-
-      {/* Omuz plakaları */}
-      <ellipse cx="28" cy="57" rx="10" ry="6" fill="#4A7A9A" transform="rotate(-10 28 57)" />
-      <ellipse cx="72" cy="57" rx="10" ry="6" fill="#4A7A9A" transform="rotate(10 72 57)" />
-
-      {/* Kollar */}
-      <rect x="16" y="56" width="13" height="24" rx="6" fill="#3A6080" />
-      <rect x="71" y="56" width="13" height="24" rx="6" fill="#3A6080" />
-      <circle cx="22" cy="81" r="7" fill="#5A7A90" />
-      <circle cx="78" cy="81" r="7" fill="#5A7A90" />
-
-      {/* Kalkan — sol el */}
-      <path d="M8 72 L8 90 Q16 96 24 90 L24 72 Q16 68 8 72Z" fill="url(#c3-shield)" />
-      <path d="M16 74 L16 88" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
-      <path d="M10 81 L22 81" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
-
-      {/* Baş */}
-      <circle cx="50" cy="32" r="23" fill="url(#c3-face)" />
-      <ellipse cx="60" cy="40" rx="12" ry="9" fill="rgba(160,100,30,0.2)" />
-
-      {/* Miğfer */}
-      <path d="M28 32 Q30 12 50 10 Q70 12 72 32" fill="#3A6080" />
-      <rect x="34" y="26" width="32" height="6" rx="2" fill="#2A4A60" />
-
-      {/* Gözler — güçlü */}
-      <ellipse cx="43" cy="35" rx="5" ry="4" fill="white" />
-      <ellipse cx="57" cy="35" rx="5" ry="4" fill="white" />
-      <circle cx="44" cy="36" r="3" fill="#1C1410" />
-      <circle cx="58" cy="36" r="3" fill="#1C1410" />
-      <circle cx="45" cy="35" r="1.2" fill="white" />
-      <circle cx="59" cy="35" r="1.2" fill="white" />
-
-      {/* Ağız — sabit çizgi */}
-      <path d="M43 44 L57 44" stroke="#8B5020" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-// ─── Tier 4: Kahraman ────────────────────────────────────────
-// Pelerin, marigold ışık efekti, güçlü poz.
-function Kahraman() {
-  return (
-    <svg
-      width="185" height="200"
-      viewBox="0 0 110 120"
-      fill="none"
-      style={{ filter: 'drop-shadow(0 0 18px rgba(242,183,5,0.4)) drop-shadow(0 14px 24px rgba(0,0,0,0.25))', transform: 'scale(1.05)' }}
-    >
-      <defs>
-        <radialGradient id="c4-body" cx="35%" cy="25%" r="60%">
-          <stop offset="0%" stopColor="#A060D0" />
-          <stop offset="100%" stopColor="#5A1080" />
-        </radialGradient>
-        <radialGradient id="c4-face" cx="42%" cy="38%" r="55%">
-          <stop offset="0%" stopColor="#FDDBA0" />
-          <stop offset="100%" stopColor="#C49040" />
-        </radialGradient>
-        <linearGradient id="c4-cape" x1="0" y1="0" x2="0.3" y2="1">
-          <stop offset="0%" stopColor="#F2B705" />
-          <stop offset="60%" stopColor="#C88800" />
-          <stop offset="100%" stopColor="#8B5E00" />
-        </linearGradient>
-        <radialGradient id="c4-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="rgba(242,183,5,0.3)" />
-          <stop offset="100%" stopColor="rgba(242,183,5,0)" />
-        </radialGradient>
-      </defs>
-
-      {/* Parıltı halkası (arka) */}
-      <circle cx="55" cy="55" r="52" fill="url(#c4-glow)" />
-
-      {/* Gölge */}
-      <ellipse cx="55" cy="116" rx="32" ry="6" fill="rgba(0,0,0,0.2)" />
-
-      {/* Pelerin */}
-      <path d="M28 58 Q15 80 18 110 L45 95 L55 100 L65 95 L92 110 Q95 80 82 58 Q55 68 28 58Z"
-        fill="url(#c4-cape)" />
-      {/* Pelerin iç kenarı */}
-      <path d="M35 60 Q55 72 75 60" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" fill="none" />
-
-      {/* Bacaklar */}
-      <rect x="40" y="85" width="13" height="26" rx="6" fill="#3A0860" />
-      <rect x="57" y="85" width="13" height="26" rx="6" fill="#3A0860" />
-      <ellipse cx="46" cy="111" rx="10" ry="4.5" fill="#280540" />
-      <ellipse cx="63" cy="111" rx="10" ry="4.5" fill="#280540" />
-
-      {/* Gövde */}
-      <path d="M32 55 L32 88 Q55 96 78 88 L78 55 Q55 47 32 55Z" fill="url(#c4-body)" />
-      {/* Marigold rozet */}
-      <circle cx="55" cy="70" r="8" fill="#F2B705" />
-      <text x="51" y="74" fontSize="9" fill="white" fontFamily="serif">★</text>
-
-      {/* Omuzlar */}
-      <circle cx="32" cy="58" r="10" fill="#7030A0" />
-      <circle cx="78" cy="58" r="10" fill="#7030A0" />
-      {/* Omuz altın kenar */}
-      <circle cx="32" cy="58" r="10" stroke="#F2B705" strokeWidth="2" fill="none" />
-      <circle cx="78" cy="58" r="10" stroke="#F2B705" strokeWidth="2" fill="none" />
-
-      {/* Kollar */}
-      <rect x="18" y="58" width="15" height="26" rx="7" fill="#5A1080" />
-      <rect x="77" y="58" width="15" height="26" rx="7" fill="#5A1080" />
-      {/* Ellerden enerji çıkışı */}
-      <circle cx="25" cy="85" r="9" fill="#F2B705" opacity="0.9" />
-      <circle cx="85" cy="85" r="9" fill="#F2B705" opacity="0.9" />
-      <circle cx="25" cy="85" r="5" fill="white" opacity="0.8" />
-      <circle cx="85" cy="85" r="5" fill="white" opacity="0.8" />
-
-      {/* Baş */}
-      <circle cx="55" cy="32" r="24" fill="url(#c4-face)" />
-      <ellipse cx="64" cy="40" rx="12" ry="9" fill="rgba(160,100,30,0.2)" />
-
-      {/* Saç / kask üstü */}
-      <path d="M32 28 Q38 8 55 6 Q72 8 78 28" fill="#2A0840" />
-      {/* Altın kask kenarı */}
-      <path d="M33 30 Q55 22 77 30" stroke="#F2B705" strokeWidth="2.5" fill="none" />
-
-      {/* Gözler — parlayan */}
-      <ellipse cx="46" cy="35" rx="6" ry="5" fill="white" />
-      <ellipse cx="64" cy="35" rx="6" ry="5" fill="white" />
-      <circle cx="47" cy="36" r="3.5" fill="#F2B705" />
-      <circle cx="65" cy="36" r="3.5" fill="#F2B705" />
-      <circle cx="47" cy="36" r="2" fill="#1C1410" />
-      <circle cx="65" cy="36" r="2" fill="#1C1410" />
-      <circle cx="48" cy="35" r="1" fill="white" />
-      <circle cx="66" cy="35" r="1" fill="white" />
-
-      {/* Ağız — kendinden emin gülümseme */}
-      <path d="M46 44 Q55 50 64 44" stroke="#8B5020" strokeWidth="2" strokeLinecap="round" fill="none" />
-    </svg>
-  )
-}
-
-// ─── Tier 5: Efsane ──────────────────────────────────────────
-// Dönen altın hale, maksimum parıltı, altın rengi.
-function Efsane() {
-  return (
-    <svg
-      width="200" height="215"
-      viewBox="0 0 120 130"
-      fill="none"
-      style={{ filter: 'drop-shadow(0 0 28px rgba(242,183,5,0.7)) drop-shadow(0 16px 30px rgba(0,0,0,0.3))', transform: 'scale(1.08)' }}
-    >
-      <defs>
-        <radialGradient id="c5-body" cx="35%" cy="25%" r="60%">
-          <stop offset="0%" stopColor="#FFD060" />
-          <stop offset="100%" stopColor="#B8700A" />
-        </radialGradient>
-        <radialGradient id="c5-face" cx="42%" cy="38%" r="55%">
-          <stop offset="0%" stopColor="#FFF0C0" />
-          <stop offset="100%" stopColor="#E0A840" />
-        </radialGradient>
-        <linearGradient id="c5-cape" x1="0" y1="0" x2="0.2" y2="1">
-          <stop offset="0%" stopColor="#FFE44D" />
-          <stop offset="100%" stopColor="#9A6B00" />
-        </linearGradient>
-        <radialGradient id="c5-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="rgba(242,183,5,0.5)" />
-          <stop offset="100%" stopColor="rgba(242,183,5,0)" />
-        </radialGradient>
-      </defs>
-
-      {/* Büyük parıltı halkası */}
-      <circle cx="60" cy="60" r="58" fill="url(#c5-glow)" />
-
       {/* Dönen dış hale */}
-      <g className="character-halo" style={{ transformOrigin: '60px 60px' }}>
-        {[0,45,90,135,180,225,270,315].map((deg, i) => {
+      <g className="character-halo"
+        style={{ transformOrigin: '60px 62px' }}>
+        <circle cx="60" cy="62" r="56"
+          stroke="#F2B705" strokeWidth="2" strokeDasharray="7 5"
+          fill="none" opacity="0.55" />
+        {[0,60,120,180,240,300].map((deg, i) => {
           const rad = (deg * Math.PI) / 180
-          const x = 60 + 52 * Math.cos(rad)
-          const y = 60 + 52 * Math.sin(rad)
-          return <circle key={i} cx={x} cy={y} r={i % 2 === 0 ? 4 : 2.5} fill="#F2B705" opacity={i % 2 === 0 ? 0.9 : 0.5} />
+          const x = 60 + 56 * Math.cos(rad)
+          const y = 62 + 56 * Math.sin(rad)
+          return <circle key={i} cx={x} cy={y} r={3} fill="#F2B705" opacity="0.8" />
         })}
-        <circle cx="60" cy="60" r="50" stroke="#F2B705" strokeWidth="1.5" strokeDasharray="6 4" fill="none" opacity="0.6" />
       </g>
 
-      {/* Gölge */}
-      <ellipse cx="60" cy="126" rx="36" ry="6.5" fill="rgba(0,0,0,0.22)" />
+      {/* Parıltı arka */}
+      <circle cx="60" cy="62" r="50" fill="rgba(242,183,5,0.08)" />
 
-      {/* Pelerin */}
-      <path d="M32 60 Q16 85 20 120 L50 102 L60 108 L70 102 L100 120 Q104 85 88 60 Q60 72 32 60Z"
-        fill="url(#c5-cape)" />
-      <path d="M38 62 Q60 76 82 62" stroke="rgba(255,255,255,0.3)" strokeWidth="2" fill="none" />
+      <ellipse cx="60" cy="131" rx="30" ry="6" fill="rgba(0,0,0,0.18)" />
 
-      {/* Bacaklar */}
-      <rect x="44" y="92" width="14" height="28" rx="7" fill="#9A6B00" />
-      <rect x="62" y="92" width="14" height="28" rx="7" fill="#9A6B00" />
-      <ellipse cx="51" cy="120" rx="11" ry="5" fill="#7A5000" />
-      <ellipse cx="69" cy="120" rx="11" ry="5" fill="#7A5000" />
+      {/* Altın pelerin */}
+      <path d="M38 98 Q24 112 28 130 L60 116 L92 130 Q96 112 82 98 Q60 108 38 98Z"
+        fill="linear-gradient(#FFE04D,#9A6B00)" />
+      <path
+        d="M38 98 Q24 112 28 130 L60 116 L92 130 Q96 112 82 98 Q60 108 38 98Z"
+        fill="#F2B705" opacity="0.9" />
+      <path d="M40 99 Q60 110 80 99"
+        stroke="rgba(255,255,255,0.35)" strokeWidth="1.8" fill="none" />
 
-      {/* Gövde — altın */}
-      <path d="M34 58 L34 95 Q60 104 86 95 L86 58 Q60 50 34 58Z" fill="url(#c5-body)" />
-      {/* Merkez kristal */}
-      <polygon points="60,62 66,70 60,78 54,70" fill="white" opacity="0.9" />
-      <polygon points="60,62 66,70 60,78 54,70" stroke="#F2B705" strokeWidth="1.5" fill="none" />
+      <g transform="translate(10, 0)">
+        <BearBase furColor={GOLD_FUR} eyeGlow={true} smile="big">
+          {/* Büyük altın taç */}
+          <path d="M23 36 L29 18 L38 30 L50 14 L62 30 L71 18 L77 36"
+            fill="#F2B705" />
+          {/* Taç mücevherleri */}
+          <circle cx="50" cy="15" r="5" fill="white" />
+          <circle cx="50" cy="15" r="3" fill="#AAE0FF" />
+          <circle cx="29" cy="19" r="3.5" fill="#FFB0C0" />
+          <circle cx="71" cy="19" r="3.5" fill="#B0FFB8" />
+          {/* Taç kenar şeridi */}
+          <rect x="22" y="34" width="56" height="5" rx="2.5" fill="#E0A500" />
 
-      {/* Omuzlar */}
-      <circle cx="34" cy="62" r="12" fill="#D4900A" />
-      <circle cx="86" cy="62" r="12" fill="#D4900A" />
-      <circle cx="34" cy="62" r="12" stroke="white" strokeWidth="2" fill="none" opacity="0.6" />
-      <circle cx="86" cy="62" r="12" stroke="white" strokeWidth="2" fill="none" opacity="0.6" />
+          {/* Kollar — açık, zafer pozu */}
+          <ellipse cx="18" cy="94" rx="9" ry="15" fill={GOLD_FUR}
+            transform="rotate(25 18 94)" />
+          <circle cx="12" cy="106" r="9" fill={GOLD_FUR} />
+          {/* Enerji efekti sol el */}
+          <circle cx="10" cy="107" r="5" fill="#FFE04D" opacity="0.8" />
 
-      {/* Kollar */}
-      <rect x="19" y="62" width="16" height="28" rx="8" fill="#B8700A" />
-      <rect x="85" y="62" width="16" height="28" rx="8" fill="#B8700A" />
-      {/* Enerji elleri */}
-      <circle cx="27" cy="91" r="10" fill="#FFE44D" />
-      <circle cx="93" cy="91" r="10" fill="#FFE44D" />
-      <circle cx="27" cy="91" r="6" fill="white" />
-      <circle cx="93" cy="91" r="6" fill="white" />
-      <circle cx="27" cy="91" r="3" fill="#F2B705" />
-      <circle cx="93" cy="91" r="3" fill="#F2B705" />
+          <ellipse cx="82" cy="94" rx="9" ry="15" fill={GOLD_FUR}
+            transform="rotate(-25 82 94)" />
+          <circle cx="88" cy="106" r="9" fill={GOLD_FUR} />
+          {/* Enerji efekti sağ el */}
+          <circle cx="90" cy="107" r="5" fill="#FFE04D" opacity="0.8" />
 
-      {/* Baş */}
-      <circle cx="60" cy="34" r="25" fill="url(#c5-face)" />
-      <ellipse cx="70" cy="43" rx="13" ry="10" fill="rgba(200,140,40,0.2)" />
+          {/* Merkez altın kristal */}
+          <circle cx="50" cy="96" r="9" fill="#FFE04D" />
+          <circle cx="50" cy="96" r="5.5" fill="white" opacity="0.9" />
+          <circle cx="50" cy="96" r="3" fill="#F2B705" />
 
-      {/* Altın taç */}
-      <path d="M36 28 L42 14 L50 22 L60 10 L70 22 L78 14 L84 28" fill="#F2B705" />
-      <circle cx="60" cy="11" r="4" fill="white" />
-      <circle cx="42" cy="15" r="3" fill="#FFD060" />
-      <circle cx="78" cy="15" r="3" fill="#FFD060" />
-
-      {/* Gözler — altın parlayan */}
-      <ellipse cx="50" cy="36" rx="6.5" ry="5.5" fill="white" />
-      <ellipse cx="70" cy="36" rx="6.5" ry="5.5" fill="white" />
-      <circle cx="51" cy="37" r="4" fill="#F2B705" />
-      <circle cx="71" cy="37" r="4" fill="#F2B705" />
-      <circle cx="51" cy="37" r="2" fill="#1C1410" />
-      <circle cx="71" cy="37" r="2" fill="#1C1410" />
-      <circle cx="52" cy="36" r="1.2" fill="white" />
-      <circle cx="72" cy="36" r="1.2" fill="white" />
-
-      {/* Gülümseme — büyük */}
-      <path d="M48 46 Q60 54 72 46" stroke="#8B5010" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+          {/* Parıltı yıldızları çevresinde */}
+          <text x="14" y="80" fontSize="10" fill="#F2B705" opacity="0.9">✦</text>
+          <text x="76" y="80" fontSize="10" fill="#F2B705" opacity="0.9">✦</text>
+          <text x="44" y="16" fontSize="8"  fill="#F2B705" opacity="0.8">✦</text>
+        </BearBase>
+      </g>
     </svg>
   )
 }

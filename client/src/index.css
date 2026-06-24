@@ -108,16 +108,7 @@
   transform-origin: center center;
 }
 
-/* Tier 2 yumruk kaldırma */
-@keyframes punch {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  30%       { transform: rotate(-15deg) translateY(-4px); }
-  60%       { transform: rotate(5deg) translateY(0); }
-}
-.character-punch {
-  animation: punch 2.5s ease-in-out infinite;
-  transform-origin: bottom center;
-}
+/* Tier 2 yumruk kaldırma — artık SVG animateTransform ile yapılıyor */
 
 /* Özel bileşen stilleri */
 @layer components {
