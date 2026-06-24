@@ -9,6 +9,10 @@
 import { useState, useEffect } from 'react'
 import { getAIStatus, getAISuggestions } from '../api'
 
+// Modül seviyesi önbellek — bileşen yeniden mount olsa bile öneriler kaybolmaz
+const cache = {}
+const addedCache = {}
+
 // Yıldız ikonu
 function IconSparkle() {
   return (
@@ -32,11 +36,11 @@ function IconPlus() {
 
 export default function AISuggestions({ section, onAdd }) {
   const [aiEnabled, setAiEnabled]       = useState(false)
-  const [status, setStatus]             = useState('idle') // idle | loading | done | error
-  const [suggestions, setSuggestions]   = useState([])
+  const [status, setStatus]             = useState(() => cache[section]?.length > 0 ? 'done' : 'idle')
+  const [suggestions, setSuggestions]   = useState(() => cache[section] || [])
   const [errorMsg, setErrorMsg]         = useState('')
-  const [addingIdx, setAddingIdx]       = useState(null) // hangi kart ekleniyor
-  const [addedIdxs, setAddedIdxs]       = useState(new Set()) // eklenen kartlar
+  const [addingIdx, setAddingIdx]       = useState(null)
+  const [addedIdxs, setAddedIdxs]       = useState(() => addedCache[section] || new Set())
 
   // API anahtarı var mı kontrol et
   useEffect(() => {
@@ -51,11 +55,15 @@ export default function AISuggestions({ section, onAdd }) {
     setStatus('loading')
     setSuggestions([])
     setErrorMsg('')
-    setAddedIdxs(new Set())
+    const freshAdded = new Set()
+    setAddedIdxs(freshAdded)
+    addedCache[section] = freshAdded
 
     try {
       const { suggestions: list } = await getAISuggestions(section)
-      setSuggestions(list || [])
+      const result = list || []
+      setSuggestions(result)
+      cache[section] = result
       setStatus('done')
     } catch (err) {
       setErrorMsg(err.message || 'Öneri alınamadı.')
@@ -68,7 +76,11 @@ export default function AISuggestions({ section, onAdd }) {
     setAddingIdx(idx)
     try {
       await onAdd(suggestions[idx].payload)
-      setAddedIdxs((prev) => new Set([...prev, idx]))
+      setAddedIdxs((prev) => {
+        const next = new Set([...prev, idx])
+        addedCache[section] = next
+        return next
+      })
     } catch (err) {
       console.error('Ekleme hatası:', err)
     } finally {
