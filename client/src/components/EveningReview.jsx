@@ -138,12 +138,12 @@ export default function EveningReview() {
             padding: '16px 20px',
           }}
         >
-          <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-accent-ink)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
             ☀️ Sabah odağın
           </p>
           <p
-            className="font-display italic"
-            style={{ fontSize: '1.0625rem', color: 'var(--color-ink)', lineHeight: 1.5 }}
+            className="font-display"
+            style={{ fontSize: '1.0625rem', fontWeight: 600, color: 'var(--color-ink)', lineHeight: 1.5 }}
           >
             "{morningFocus}"
           </p>

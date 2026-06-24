@@ -24,3 +24,7 @@ Thumbs.db
 # Log dosyaları
 *.log
 npm-debug.log*
+.env
+data/
+token.json
+.DS_Store

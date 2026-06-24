@@ -136,6 +136,18 @@ export const getMorningFocus = () => request('/reviews/morning-focus')
 export const saveReview = (data) =>
   request('/reviews', { method: 'POST', body: JSON.stringify(data) })
 
+// --- Yapay zekâ önerileri ---
+
+/** AI'ın etkin olup olmadığını kontrol et (OPENROUTER_API_KEY var mı?) */
+export const getAIStatus = () => request('/ai/status')
+
+/** Bölüme özel Atomic Habits tabanlı öneriler al */
+export const getAISuggestions = (section) =>
+  request('/ai/suggest', {
+    method: 'POST',
+    body: JSON.stringify({ section }),
+  })
+
 // --- Google Calendar ---
 
 /** Takvim bağlantı durumunu kontrol et */

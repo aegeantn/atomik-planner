@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { getHabits, addHabit, deleteHabit, toggleHabitLog, getIdentities } from '../api'
+import AISuggestions from './AISuggestions'
 
 // --- Tarih yardımcıları (client-side, server ile aynı mantık) ---
 function todayStr() {
@@ -800,6 +801,15 @@ export default function HabitTracker() {
           ))}
         </ul>
       )}
+
+      {/* Yapay zekâ önerileri */}
+      <AISuggestions
+        section="aliskanliklar"
+        onAdd={async (payload) => {
+          const newHabit = await addHabit(payload)
+          setHabits((prev) => [...prev, { ...newHabit, today_completed: 0, streak: 0, recent_logs: [], never_miss_twice_alert: false }])
+        }}
+      />
     </section>
   )
 }

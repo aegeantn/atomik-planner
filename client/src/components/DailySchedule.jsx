@@ -9,6 +9,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getGoals, addGoal, proposeSchedule, confirmSchedule, toggleGoalDone, deleteGoal,
          getCalendarStatus, getCalendarAuthUrl, syncToCalendar, disconnectCalendar } from '../api'
+import AISuggestions from './AISuggestions'
 
 // --- Tarih yardımcısı ---
 function todayStr() {
@@ -287,7 +288,7 @@ function ProgressBar({ goals }) {
           width: `${pct}%`,
           background: pct === 100
             ? 'var(--color-success, #059669)'
-            : 'linear-gradient(90deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 70%, #7C3AED))',
+            : 'linear-gradient(90deg, var(--color-accent), var(--dot-orange))',
           borderRadius: '2px',
           transition: 'width 400ms ease',
         }} />
@@ -900,6 +901,16 @@ export default function DailySchedule() {
       {!isLoading && mode !== 'preview' && (
         <CalendarPanel goals={goals} date={date} />
       )}
+
+      {/* Yapay zekâ önerileri */}
+      <AISuggestions
+        section="program"
+        onAdd={async (payload) => {
+          const newGoal = await addGoal(payload)
+          setGoals((prev) => [...prev, newGoal])
+          if (goals.length === 0) setMode('scheduled')
+        }}
+      />
     </section>
   )
 }

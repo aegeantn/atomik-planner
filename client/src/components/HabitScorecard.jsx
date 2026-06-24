@@ -11,6 +11,7 @@ import {
   updateScorecardRating,
   deleteScorecardItem,
 } from '../api'
+import AISuggestions from './AISuggestions'
 
 // --- Sabit: puanlama seçenekleri ---
 const RATINGS = [
@@ -404,6 +405,15 @@ export default function HabitScorecard() {
           {input.length} / 300
         </p>
       )}
+
+      {/* Yapay zekâ önerileri */}
+      <AISuggestions
+        section="tarama"
+        onAdd={async (payload) => {
+          const newItem = await addScorecardItem(payload.behavior)
+          setItems((prev) => [newItem, ...prev])
+        }}
+      />
     </section>
   )
 }

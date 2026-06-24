@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Atom orbit ring — marigold -->
+  <ellipse cx="16" cy="16" rx="12" ry="5.5" stroke="#F2B705" stroke-width="2.5" transform="rotate(-35 16 16)"/>
+  <!-- Nucleus — ink -->
+  <circle cx="16" cy="16" r="3.5" fill="#15130E"/>
+  <!-- Electron — marigold -->
+  <circle cx="24" cy="9" r="2.5" fill="#F2B705"/>
+</svg>

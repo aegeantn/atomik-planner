@@ -1,5 +1,5 @@
 /* Google Fonts — @import tailwindcss'den önce gelmeli */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
 
 /* Tailwind v4 */
 @import "tailwindcss";
@@ -7,24 +7,33 @@
 /*
   Tasarım Jetonları (@theme)
   --------------------------
-  Burada tanımlanan değişkenler Tailwind utility class'larına dönüşür:
+  Atomic Habits kitap kapağından türetilmiş palet:
+  Marigold sarı (#F2B705) + sıcak siyah + kapağın konfeti noktaları
   --color-accent → bg-accent, text-accent, border-accent
   --font-display → font-display
 */
 @theme {
   /* Palet */
-  --color-canvas: #F8F7F4;      /* Sayfa arka planı — sıcak parşömen */
-  --color-surface: #FFFFFF;     /* Kart arka planı */
-  --color-ink: #1C1917;         /* Ana metin */
-  --color-muted: #78716C;       /* İkincil metin, placeholder */
-  --color-accent: #7C3AED;      /* Violet — niyet ve odak rengi */
-  --color-accent-soft: #EDE9FE; /* Violet'in açık tonu, soft arka plan için */
-  --color-border: #E7E5E4;      /* Sınır rengi */
-  --color-danger: #DC2626;      /* Silme butonu hover'ı */
-  --color-success: #059669;     /* Başarı durumları */
+  --color-canvas: #FAF7EF;        /* Sayfa zemini — kapağın sıcak kağıt tonu */
+  --color-surface: #FFFFFF;       /* Kart arka planı */
+  --color-ink: #15130E;           /* Ana metin — sıcak siyah */
+  --color-muted: #6B665C;         /* İkincil metin, placeholder */
+  --color-accent: #F2B705;        /* Marigold — kitap kapağının imza rengi */
+  --color-accent-ink: #9A6B00;    /* Koyu kehribar — aksan metin/link/odak (AA kontrast) */
+  --color-accent-soft: #FDF1C9;   /* Soluk sarı — vurgu zemini, highlighter */
+  --color-border: #E9E4D6;        /* Sınır rengi */
+  --color-danger: #DC2626;        /* Hata / silme */
+  --color-success: #2E9E5B;       /* Başarı — kapağın yeşili */
+
+  /* Kapak konfeti nokta renkleri — logo yörüngesi + grafik vurguları */
+  --dot-teal:   #1FA6A0;
+  --dot-blue:   #2D6CDF;
+  --dot-red:    #E5484D;
+  --dot-orange: #F2820D;
+  --dot-pink:   #E255A1;
 
   /* Tipografi */
-  --font-display: 'Fraunces', Georgia, serif;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
   /* Body/UI için Inter; @layer base içinde body'ye atanıyor */
 }
 
@@ -45,9 +54,9 @@
     line-height: 1.6;
   }
 
-  /* Klavye navigasyonu için odak halkası */
+  /* Klavye navigasyonu için odak halkası — koyu kehribar (AA kontrast) */
   :focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid var(--color-accent-ink);
     outline-offset: 2px;
   }
 }
@@ -64,6 +73,11 @@
   100% { transform: scale(1); }
 }
 
+@keyframes aiPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+
 /* Sekme içeriği geçiş efekti */
 .page-section {
   animation: fadeSlideIn 220ms ease both;
@@ -76,7 +90,7 @@
 
 /* Özel bileşen stilleri */
 @layer components {
-  /* Kimlik ekleme input'u — odaklanınca violet halka */
+  /* Standart metin girişi — odaklanınca kehribar halka */
   .input-primary {
     width: 100%;
     border: 1.5px solid var(--color-border);
@@ -94,18 +108,17 @@
     }
 
     &:focus {
-      border-color: var(--color-accent);
-      /* color-mix: violet'in %12 opaklıkta yumuşak halkası */
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 12%, transparent);
+      border-color: var(--color-accent-ink);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 20%, transparent);
     }
   }
 
-  /* İmza öğe: Kimlik kartı sol kenarda violet gradient çizgi */
+  /* İmza öğe: Kimlik kartı sol kenarda marigold gradient çizgi */
   .identity-item {
     position: relative;
     background: var(--color-surface);
     border: 1.5px solid var(--color-border);
-    border-left: none;  /* Sol kenarda gradient kullanıyoruz */
+    border-left: none;
     border-radius: 12px;
     padding: 14px 16px 14px 20px;
     transition: transform 180ms ease, box-shadow 180ms ease;
@@ -113,7 +126,7 @@
     align-items: center;
     gap: 12px;
 
-    /* Sol violet gradient çizgi — imza öğe */
+    /* Sol marigold gradient çizgi */
     &::before {
       content: '';
       position: absolute;
@@ -129,10 +142,71 @@
       );
     }
 
-    /* Nefes alan hover efekti */
     &:hover {
       transform: translateY(-1px);
       box-shadow: 0 4px 16px color-mix(in srgb, var(--color-ink) 8%, transparent);
+    }
+  }
+
+  /* Sekme navigasyonu — mobilde sarılır, masaüstünde tek satır */
+  .tab-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding-bottom: 0;
+  }
+
+  .tab-btn {
+    flex-shrink: 0;
+    padding: 8px 11px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--color-muted);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 150ms ease, border-color 150ms ease;
+    white-space: nowrap;
+  }
+
+  .tab-btn:hover {
+    color: var(--color-ink);
+  }
+
+  .tab-btn--active {
+    font-weight: 600;
+    color: var(--color-ink);
+    border-bottom-color: var(--color-accent);
+  }
+
+  /* Masaüstünde tek satır */
+  @media (min-width: 480px) {
+    .tab-btn {
+      font-size: 0.875rem;
+      padding: 8px 12px;
+    }
+  }
+
+  /* AI öneri paneli — marigold kenarlıklı, yumuşak zemin */
+  .ai-panel {
+    border: 1.5px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+    background: color-mix(in srgb, var(--color-accent-soft) 60%, var(--color-surface));
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+
+  .ai-suggestion-card {
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    transition: box-shadow 150ms ease;
+
+    &:hover {
+      box-shadow: 0 2px 8px color-mix(in srgb, var(--color-ink) 6%, transparent);
     }
   }
 }

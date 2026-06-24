@@ -49,6 +49,9 @@ app.use('/api/stats', require('./routes/stats'))
 // n8n webhook uçları
 app.use('/api/n8n', require('./routes/n8n'))
 
+// Yapay zekâ önerileri (OpenRouter)
+app.use('/api/ai', require('./routes/ai'))
+
 // Google Calendar
 const calendarRouter = require('./routes/calendar')
 app.use('/api/calendar', calendarRouter)

@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { getIdentities, addIdentity, deleteIdentity } from '../api'
+import AISuggestions from './AISuggestions'
 
 // --- İkonlar (inline SVG — dış bağımlılık yok) ---
 
@@ -148,7 +149,7 @@ export default function IdentityCard() {
                 padding: '2px 9px',
                 borderRadius: '20px',
                 background: 'var(--color-accent-soft)',
-                color: 'var(--color-accent)',
+                color: 'var(--color-accent-ink)',
                 letterSpacing: '0.01em',
               }}
             >
@@ -187,9 +188,9 @@ export default function IdentityCard() {
         <ul className="flex flex-col gap-3 mb-6" aria-label="Kimlik beyanları listesi">
           {identities.map((item) => (
             <li key={item.id} className="identity-item">
-              {/* Beyan metni — imza: Fraunces italic */}
+              {/* Beyan metni */}
               <p
-                className="font-display italic flex-1 leading-snug"
+                className="font-display flex-1 leading-snug"
                 style={{ fontSize: '1.0625rem', color: 'var(--color-ink)' }}
               >
                 {item.statement}
@@ -290,6 +291,15 @@ export default function IdentityCard() {
           {input.length} / 300
         </p>
       )}
+
+      {/* Yapay zekâ önerileri */}
+      <AISuggestions
+        section="kimlik"
+        onAdd={async (payload) => {
+          const newIdentity = await addIdentity(payload.statement)
+          setIdentities((prev) => [newIdentity, ...prev])
+        }}
+      />
     </section>
   )
 }
