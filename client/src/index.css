@@ -108,7 +108,17 @@
   transform-origin: center center;
 }
 
-/* Tier 2 yumruk kaldırma — artık SVG animateTransform ile yapılıyor */
+/* T1 Çaylak — el sallama salınımı */
+@keyframes bear-sway {
+  0%, 100% { transform: rotate(0deg); }
+  25%       { transform: rotate(-10deg); }
+  75%       { transform: rotate(10deg); }
+}
+.bear-sway {
+  animation: bear-sway 1s ease-in-out infinite;
+  transform-origin: bottom center;
+  display: block;
+}
 
 /* Özel bileşen stilleri */
 @layer components {
