@@ -5,6 +5,9 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app/client
 
+# Build aşamasında development modu zorunlu — vite ve diğer devDependencies yüklensin
+ENV NODE_ENV=development
+
 # Önce sadece package dosyalarını kopyala → Docker layer cache'i kullanır
 COPY client/package*.json ./
 RUN npm install
