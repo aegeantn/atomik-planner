@@ -1,0 +1,58 @@
+{
+  "name": "Atomik Planner — Sabah Planı Bildirimi",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 7 * * *" }]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Her sabah 07:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [200, 300],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/n8n/morning-briefing",
+        "options": {}
+      },
+      "id": "get-briefing",
+      "name": "Sabah Planını Al",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [440, 300],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\n\nconst focusLine = d.morning_focus\n  ? `☀️ Bugünün odağı: \"${d.morning_focus}\"\\n\\n`\n  : '';\n\nconst scheduleBlock = d.schedule.length\n  ? d.schedule.map(g => `  ${g.start_time || '--:--'} ${g.title}`).join('\\n')\n  : '  (Program henüz oluşturulmamış — uygulamayı aç ve planla)';\n\nconst habitsBlock = d.active_habits.length\n  ? d.active_habits.map(h => {\n      const time = h.preferred_time ? ` [${h.preferred_time}]` : '';\n      const mini = h.two_minute_version ? ` — 2 dk: ${h.two_minute_version}` : '';\n      return `  • ${h.name}${time}${mini}`;\n    }).join('\\n')\n  : '  (Alışkanlık tanımlanmamış)';\n\nconst subject = `☀️ Atomik Planner — ${d.date} Sabah Planın`;\nconst body = `Günaydın! ${d.date}\\n\\n` +\n  focusLine +\n  `📅 Bugünün programı:\\n${scheduleBlock}\\n\\n` +\n  `💪 Aktif alışkanlıkların:\\n${habitsBlock}`;\n\nreturn [{ json: { subject, body } }];"
+      },
+      "id": "format-briefing",
+      "name": "Sabah Metni Hazırla",
+      "type": "n8n-nodes-base.code",
+      "position": [680, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.SUMMARY_EMAIL || 'egetezcan62@gmail.com' }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.body }}",
+        "options": {}
+      },
+      "id": "send-email",
+      "name": "Sabah E-postası Gönder",
+      "type": "n8n-nodes-base.gmail",
+      "position": [920, 300],
+      "typeVersion": 2.1
+    }
+  ],
+  "connections": {
+    "Her sabah 07:00": { "main": [[{ "node": "Sabah Planını Al", "type": "main", "index": 0 }]] },
+    "Sabah Planını Al": { "main": [[{ "node": "Sabah Metni Hazırla", "type": "main", "index": 0 }]] },
+    "Sabah Metni Hazırla": { "main": [[{ "node": "Sabah E-postası Gönder", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "meta": { "description": "Her sabah 07:00'de günün programını ve sabah odağını e-posta olarak gönderir." }
+}

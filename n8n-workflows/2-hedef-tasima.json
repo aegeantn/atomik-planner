@@ -1,0 +1,77 @@
+{
+  "name": "Atomik Planner — Tamamlanmayan Hedefleri Taşı",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "55 23 * * *" }]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Her gece 23:55",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [200, 300],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/n8n/carry-over",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [{ "name": "date", "value": "={{ $now.format('yyyy-MM-dd') }}" }]
+        },
+        "options": {}
+      },
+      "id": "carry-over",
+      "name": "Hedefleri Ertesi Güne Taşı",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [440, 300],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [{ "leftValue": "={{ $json.carried }}", "rightValue": 0, "operator": { "type": "number", "operation": "gt" } }]
+        }
+      },
+      "id": "check-carried",
+      "name": "Taşınan var mı?",
+      "type": "n8n-nodes-base.filter",
+      "position": [680, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nconst list = (d.items || []).map(t => `  • ${t}`).join('\\n');\nreturn [{\n  json: {\n    subject: `Atomik Planner — ${d.carried} hedef yarına taşındı`,\n    body: `${d.carried} tamamlanmayan hedef ${d.nextDate} tarihine taşındı:\\n\\n${list}\\n\\nYarın bunları da bitirebilirsin!`\n  }\n}];"
+      },
+      "id": "format-message",
+      "name": "Bildirim Metni Hazırla",
+      "type": "n8n-nodes-base.code",
+      "position": [920, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.SUMMARY_EMAIL || 'egetezcan62@gmail.com' }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.body }}",
+        "options": {}
+      },
+      "id": "send-email",
+      "name": "Bildirim Gönder",
+      "type": "n8n-nodes-base.gmail",
+      "position": [1160, 300],
+      "typeVersion": 2.1
+    }
+  ],
+  "connections": {
+    "Her gece 23:55": { "main": [[{ "node": "Hedefleri Ertesi Güne Taşı", "type": "main", "index": 0 }]] },
+    "Hedefleri Ertesi Güne Taşı": { "main": [[{ "node": "Taşınan var mı?", "type": "main", "index": 0 }]] },
+    "Taşınan var mı?": { "main": [[{ "node": "Bildirim Metni Hazırla", "type": "main", "index": 0 }]] },
+    "Bildirim Metni Hazırla": { "main": [[{ "node": "Bildirim Gönder", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "meta": { "description": "Her gece 23:55'te done=false hedefleri ertesi güne kopyalar. Mükerrer koruma dahil." }
+}

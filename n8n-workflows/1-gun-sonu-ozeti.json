@@ -1,0 +1,58 @@
+{
+  "name": "Atomik Planner — Gün Sonu Özeti",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 21 * * *" }]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Her akşam 21:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [200, 300],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/n8n/daily-summary",
+        "options": {}
+      },
+      "id": "get-summary",
+      "name": "Planner'dan Özet Al",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [440, 300],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nconst habits = d.habits;\nconst goals = d.goals;\n\nconst habitList = habits.items\n  .map(h => `  ${h.completed ? '✓' : '○'} ${h.name}`)\n  .join('\\n');\n\nconst goalList = goals.items.length\n  ? goals.items.map(g => `  ${g.done ? '✓' : '○'} ${g.start_time || '--'} ${g.title}`).join('\\n')\n  : '  (Program oluşturulmamış)';\n\nconst review = d.review\n  ? `\\n📝 Akşam notu:\\n  İyi giden: ${d.review.what_went_well || '-'}\\n  Yarın odak: ${d.review.tomorrow_focus || '-'}`\n  : '';\n\nconst subject = `Atomik Planner — ${d.date} | %${habits.rate} tamamlandı`;\n\nconst body = `Günün özeti — ${d.date}\\n\\n` +\n  `📊 Alışkanlıklar: ${habits.completed}/${habits.total} (%${habits.rate})\\n${habitList}\\n\\n` +\n  `🗓 Hedefler: ${goals.completed}/${goals.total}\\n${goalList}` +\n  review;\n\nreturn [{ json: { subject, body } }];"
+      },
+      "id": "format-email",
+      "name": "E-posta Metni Hazırla",
+      "type": "n8n-nodes-base.code",
+      "position": [680, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.SUMMARY_EMAIL || 'egetezcan62@gmail.com' }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.body }}",
+        "options": {}
+      },
+      "id": "send-email",
+      "name": "E-posta Gönder",
+      "type": "n8n-nodes-base.gmail",
+      "position": [920, 300],
+      "typeVersion": 2.1
+    }
+  ],
+  "connections": {
+    "Her akşam 21:00": { "main": [[{ "node": "Planner'dan Özet Al", "type": "main", "index": 0 }]] },
+    "Planner'dan Özet Al": { "main": [[{ "node": "E-posta Metni Hazırla", "type": "main", "index": 0 }]] },
+    "E-posta Metni Hazırla": { "main": [[{ "node": "E-posta Gönder", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "meta": { "description": "Her akşam 21:00'de Atomik Planner'dan gün sonu özetini çekip e-posta ile gönderir." }
+}
