@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Logo from './components/Logo'
+import Dashboard from './components/Dashboard'
 import IdentityCard from './components/IdentityCard'
 import HabitScorecard from './components/HabitScorecard'
 import HabitTracker from './components/HabitTracker'
@@ -19,6 +20,7 @@ function todayTurkish() {
 
 // --- Sekmeler ---
 const TABS = [
+  { id: 'anasayfa',       label: '⚡ Ana Sayfa' },
   { id: 'kimlik',         label: 'Kimlik' },
   { id: 'tarama',         label: 'Tarama' },
   { id: 'aliskanliklar',  label: 'Alışkanlıklar' },
@@ -61,7 +63,7 @@ function AppHeader({ activeTab, onTabChange }) {
     >
       <div
         style={{
-          maxWidth: '700px',
+          maxWidth: '1020px',
           margin: '0 auto',
           padding: '0 20px',
         }}
@@ -143,8 +145,8 @@ const PAGE_TITLES = {
 
 // --- Ana uygulama ---
 export default function App() {
-  const [activeTab, setActiveTab] = useState('kimlik')
-  const { line1, line2, sub } = PAGE_TITLES[activeTab]
+  const [activeTab, setActiveTab] = useState('anasayfa')
+  const pageTitle = PAGE_TITLES[activeTab]
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--color-canvas)' }}>
@@ -152,7 +154,7 @@ export default function App() {
 
       <main
         style={{
-          maxWidth: '700px',
+          maxWidth: '1020px',
           margin: '0 auto',
           padding: '40px 20px 80px',
         }}
@@ -160,37 +162,40 @@ export default function App() {
         {/* key={activeTab}: sekme değişince bileşeni yeniden mount et → fadeSlideIn tetiklenir */}
         <div key={activeTab} className="page-section">
 
-          {/* Sayfa başlığı */}
-          <section aria-label="Bölüm başlığı" style={{ marginBottom: '32px' }}>
-            <h1
-              className="font-display"
-              style={{
-                fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
-                fontWeight: 700,
-                lineHeight: 1.2,
-                letterSpacing: '-0.025em',
-                color: 'var(--color-ink)',
-                marginBottom: '8px',
-              }}
-            >
-              {line1}
-              <br />
-              <Highlight>{line2}</Highlight>
-            </h1>
-            <p
-              style={{
-                fontSize: '0.9375rem',
-                color: 'var(--color-muted)',
-                lineHeight: 1.65,
-                maxWidth: '420px',
-                marginTop: '10px',
-              }}
-            >
-              {sub}
-            </p>
-          </section>
+          {/* Sayfa başlığı — Ana Sayfa'da gösterilmez */}
+          {pageTitle && (
+            <section aria-label="Bölüm başlığı" style={{ marginBottom: '32px' }}>
+              <h1
+                className="font-display"
+                style={{
+                  fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
+                  fontWeight: 700,
+                  lineHeight: 1.2,
+                  letterSpacing: '-0.025em',
+                  color: 'var(--color-ink)',
+                  marginBottom: '8px',
+                }}
+              >
+                {pageTitle.line1}
+                <br />
+                <Highlight>{pageTitle.line2}</Highlight>
+              </h1>
+              <p
+                style={{
+                  fontSize: '0.9375rem',
+                  color: 'var(--color-muted)',
+                  lineHeight: 1.65,
+                  maxWidth: '420px',
+                  marginTop: '10px',
+                }}
+              >
+                {pageTitle.sub}
+              </p>
+            </section>
+          )}
 
           {/* İçerik */}
+          {activeTab === 'anasayfa'      && <Dashboard onNavigate={setActiveTab} />}
           {activeTab === 'kimlik'        && <IdentityCard />}
           {activeTab === 'tarama'        && <HabitScorecard />}
           {activeTab === 'aliskanliklar' && <HabitTracker />}

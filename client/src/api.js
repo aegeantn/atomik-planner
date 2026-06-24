@@ -124,6 +124,9 @@ export const clearSchedule = (date) =>
 /** Alışkanlık istatistiklerini getir */
 export const getStats = (days = 7) => request(`/stats?days=${days}`)
 
+/** Kullanıcının tier (seviye) bilgisini getir */
+export const getTier = () => request('/stats/tier')
+
 // --- Akşam değerlendirmesi ---
 
 /** O günün değerlendirmesini getir */

@@ -133,4 +133,40 @@ router.get('/', (req, res) => {
   }
 })
 
+// --- GET /api/stats/tier ---
+// Kullanıcının toplam tamamlanan alışkanlık günü sayısına göre tier hesaplar.
+// Streak'e bağlı değil — bir gün kaçırsan sıfırlanmaz, birikim korunur.
+router.get('/tier', (req, res) => {
+  try {
+    const row = db.prepare(
+      "SELECT COUNT(DISTINCT date) as days FROM habit_logs WHERE completed = 1"
+    ).get()
+    const days = row?.days || 0
+
+    const TIERS = [
+      { tier: 1, name: 'Çaylak',     min: 0,   next: 7   },
+      { tier: 2, name: 'Azimli',     min: 7,   next: 21  },
+      { tier: 3, name: 'Disiplinli', min: 21,  next: 60  },
+      { tier: 4, name: 'Kahraman',   min: 60,  next: 180 },
+      { tier: 5, name: 'Efsane',     min: 180, next: null },
+    ]
+
+    const current = [...TIERS].reverse().find((t) => days >= t.min) || TIERS[0]
+    const progress = current.next
+      ? Math.min((days - current.min) / (current.next - current.min), 1)
+      : 1
+
+    res.json({
+      tier: current.tier,
+      name: current.name,
+      completedDays: days,
+      nextTierDays: current.next,
+      progress,
+    })
+  } catch (err) {
+    console.error('Tier alınamadı:', err.message)
+    res.status(500).json({ error: 'Tier alınamadı.' })
+  }
+})
+
 module.exports = router
